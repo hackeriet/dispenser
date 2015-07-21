@@ -2,6 +2,10 @@ import os
 import uuid
 import time
 
+"""
+The ledger is a collection of all transactions for a given dispenser. It is possible to ask the
+ledger for all accounts it knows about, or for a specific, named, account.
+"""
 class Ledger(object):
     def __init__(self, userdb, dispenser_id):
         self.__userdb = userdb
