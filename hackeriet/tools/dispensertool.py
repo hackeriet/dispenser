@@ -12,13 +12,14 @@ def main():
     disp = hackeriet.service.dispenser.init(root, '1234567890')
 
     print(list(disp.ledger.accounts))
+    print(list(disp.ledger.transactions_since(0)))
 
 #    print(list(ledger.accounts))
 #    print(list(ledger.transactions_since(1433864810)))
 
-#    a = d.ledger.account('brumle')
-#    a.deposit(10)
-#    a.deduct(9)
+    a = disp.ledger.account('brumle')
+    a.deposit(10)
+    a.deduct(9)
 #    s = dispenser.sync.Syncer(9000)
 #    sys.stdin.read()
 

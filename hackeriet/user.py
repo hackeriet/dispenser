@@ -4,7 +4,7 @@ class UsersRoot(object):
     def __init__(self, basepath):
         self.__basepath = basepath
     def user(self, name):
-        return User(self.__basepath, name)
+        return User(os.path.join(self.__basepath, name), name)
     def all(self):
         bp = self.__basepath
         for x in os.listdir(bp):
@@ -16,6 +16,7 @@ class User(object):
     def __init__(self, basepath, name):
         self.__basepath = basepath
         self.__name = name
+        assert len(name) > 0
     @property
     def name(self):
         return self.__name

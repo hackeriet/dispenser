@@ -1,5 +1,6 @@
 import os
-from hackeriet import Archiver
+import uuid
+import time
 
 class Ledger(object):
     def __init__(self, userdb, dispenser_id):
@@ -39,19 +40,19 @@ class Account(object):
         self.__history = []
         self.__balance = 0
         self.__writedir = os.path.join('account', 'dispenser', dispenser_id)
-        self.__basedir = os.path.join('account', 'dispenser')
-        if user.path_exists(self.__basedir):
+        self.__servicedir = os.path.join('account', 'dispenser')
+        if user.path_exists(self.__servicedir):
             self.__load()
         else:
-            user.ensure_dir(self.__basedir)
+            user.ensure_dir(self.__servicedir)
         user.ensure_dir(self.__writedir)
     @property
     def name(self):
         return self.__user.name
     def __load(self):
         u = self.__user
-        for f in u.listdir(self.__basedir):
-            dirpath = os.path.join(self.__basedir, f)
+        for f in u.listdir(self.__servicedir):
+            dirpath = os.path.join(self.__servicedir, f)
             for g in u.listdir(dirpath):
                 path = os.path.join(dirpath, g)
                 with open(u.fullpath(path), "r") as ins:
@@ -65,12 +66,12 @@ class Account(object):
                     self.__balance += amount
     def deduct(self, amount):
         tx = Transaction(uuid.uuid1().hex, int(time.time()), -amount)
-        tx.save_to(u.fullpath(self.__writedir))
+        tx.save_to(self.__user.fullpath(self.__writedir))
         self.__history.append(tx)
         self.__balance -= amount
     def deposit(self, amount):
         tx = Transaction(uuid.uuid1().hex, int(time.time()), amount)
-        tx.save_to(u.fullpath(self.__writedir))
+        tx.save_to(self.__user.fullpath(self.__writedir))
         self.__history.append(tx)
         self.__balance += amount
     def __repr__(self):
@@ -78,6 +79,6 @@ class Account(object):
     def transactions_since(self, timestamp):
         return (x for x in self.__history if x.timestamp() >= timestamp)
 
-def init(root, dispenser_id):
-    return Ledger(Archiver(root), dispenser_id)
+def init(userdb, dispenser_id):
+    return Ledger(userdb, dispenser_id)
 

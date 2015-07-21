@@ -2,6 +2,8 @@ from .ledger import Ledger
 
 class Dispenser(object):
     def __init__(self, userdb, dispenser_id):
+        assert userdb
+        assert dispenser_id
         self.__ledger = Ledger(userdb, dispenser_id)
     @property
     def ledger(self):
