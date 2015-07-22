@@ -20,6 +20,7 @@ def main():
     a = disp.ledger.account('brumle')
     a.deposit(10)
     a.deduct(9)
+    print(a.balance)
 #    s = dispenser.sync.Syncer(9000)
 #    sys.stdin.read()
 

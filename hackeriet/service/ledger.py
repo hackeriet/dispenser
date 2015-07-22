@@ -4,7 +4,8 @@ import time
 
 """
 The ledger is a collection of all transactions for a given dispenser. It is possible to ask the
-ledger for all accounts it knows about, or for a specific, named, account.
+ledger for all accounts it knows about, or for a specific, named, account. The accounts, in turn, 
+knows about all transactions for a given user.
 """
 class Ledger(object):
     def __init__(self, userdb, dispenser_id):
@@ -24,6 +25,11 @@ class Ledger(object):
         for a in self.accounts:
             yield (a.name, list(a.transactions_since(timestamp)))
 
+"""
+A transaction represents a single entry in the ledger, for a given user. Every transaction
+has a unique identifier (its hash), a timestamp (since epoch) and an amount (the delta 
+represented by this transaction).
+"""
 class Transaction(object):
     def __init__(self, hash, when, amount):
         self.__hash = hash
@@ -38,6 +44,11 @@ class Transaction(object):
     def __repr__(self):
         return "Transaction(hash=%s, amount=%d, when=%d)" % (self.__hash, self.__amount, self.__when)
 
+"""
+An account represents all transactions for a given user, together with a total balance.
+
+It is possible do deduct or deposit funds from or into an account.
+"""
 class Account(object):
     def __init__(self, user, dispenser_id):
         self.__user = user
@@ -53,6 +64,9 @@ class Account(object):
     @property
     def name(self):
         return self.__user.name
+    @property
+    def balance(self):
+        return self.__balance
     def __load(self):
         u = self.__user
         for f in u.listdir(self.__servicedir):
@@ -69,6 +83,8 @@ class Account(object):
                     self.__history.append(tx)
                     self.__balance += amount
     def deduct(self, amount):
+        if self.__balance - amount < 0:
+            raise ValueError("Insufficient funds")
         tx = Transaction(uuid.uuid1().hex, int(time.time()), -amount)
         tx.save_to(self.__user.fullpath(self.__writedir))
         self.__history.append(tx)
